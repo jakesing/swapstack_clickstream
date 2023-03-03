@@ -12,10 +12,10 @@ pipelines:
           caches:
             - node
           script:
+            - cd api
             - npm ci
-            - export ENVIRONMENT=stage
-            - npx serverless deploy --stage stage --region $AWS_REGION
-            
+            - npx serverless deploy --stage $ENVIRONMENT --region $AWS_REGION
+
       - step:
           name: Deploy API
           deployment: live
@@ -23,6 +23,6 @@ pipelines:
           caches:
             - node
           script:
+            - cd api
             - npm ci
-            - export ENVIRONMENT=live
-            - npx serverless deploy --stage live --region $AWS_REGION
+            - npx serverless deploy --stage $ENVIRONMENT --region $AWS_REGION
