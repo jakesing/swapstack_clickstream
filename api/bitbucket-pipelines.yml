@@ -1,0 +1,28 @@
+image: node:gallium-alpine3.16
+
+options:
+  max-time: 15
+
+pipelines:
+  branches:
+    develop:
+      - step:
+          name: Deploy API
+          deployment: stage
+          caches:
+            - node
+          script:
+            - npm ci
+            - export ENVIRONMENT=stage
+            - npx serverless deploy --stage stage --region $AWS_REGION
+            
+      - step:
+          name: Deploy API
+          deployment: live
+          trigger: manual
+          caches:
+            - node
+          script:
+            - npm ci
+            - export ENVIRONMENT=live
+            - npx serverless deploy --stage live --region $AWS_REGION

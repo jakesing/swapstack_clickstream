@@ -1,0 +1,38 @@
+{
+  "name": "swapstack-s3",
+  "version": "1.0.0",
+  "description": "Swapstack S3",
+  "main": "serverless.ts",
+  "private": true,
+  "scripts": {
+    "dev": "npx serverless offline --stage dev --region us-east-1 --reloadHandler",
+    "local:deploy": "npx serverless deploy --stage local --region us-east-1",
+    "stage:deploy": "npx serverless deploy --stage stage --region us-east-1",
+    "prettier:format": "prettier --write \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\"",
+    "prettier:check": "CI=true npx prettier \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\" --check"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@middy/core": "^4.2.6",
+    "@middy/do-not-wait-for-empty-event-loop": "^4.2.6"
+  },
+  "devDependencies": {
+    "@serverless/typescript": "^3.27.0",
+    "@types/aws-lambda": "^8.10.111",
+    "@types/node": "^18.14.5",
+    "esbuild": "^0.16.17",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.4",
+    "pretty-quick": "^3.1.3",
+    "serverless": "^3.28.1",
+    "serverless-esbuild": "^1.39.0",
+    "serverless-offline": "^12.0.4",
+    "serverless-prune-plugin": "^2.0.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
+    "typescript": "^4.9.5"
+  }
+}
