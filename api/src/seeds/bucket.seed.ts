@@ -3,12 +3,11 @@ import { jsonrepair } from "jsonrepair";
 import * as pLimit from "p-limit";
 
 import { IClick } from "../interfaces/IClicks";
-import IClickStreamEventParent from "../interfaces/IClickStreamEventParent";
-import IClickStreamEventChild from "../interfaces/IClickStreamEventChild";
 
 import config from "../config/vars";
 
 import { getObject, getFilePaths } from "../utils/storage";
+import { createDbEventRow } from "../utils/db.helpers";
 
 const parentTableName = config.isRelease
   ? "clickstream_events_parent"
@@ -17,11 +16,6 @@ const parentTableName = config.isRelease
 const childTableName = config.isRelease
   ? "clickstream_events_child"
   : `${config.environment}_clickstream_events_child`;
-
-type DBRow = {
-  parent: IClickStreamEventParent;
-  child: IClickStreamEventChild;
-};
 
 export async function seed(knex: Knex): Promise<void> {
   try {
@@ -47,7 +41,7 @@ export async function seed(knex: Knex): Promise<void> {
 
       await Promise.all(
         data
-          .map((row) => createDbRow(row))
+          .map((row) => createDbEventRow(row))
           .map((row) =>
             dbLimit(async () => {
               const parentId: number[] = await knex(parentTableName)
@@ -87,7 +81,7 @@ const getParsedJSON = async (path: string): Promise<IClick[]> => {
   }
 };
 
-const createDbRow = (payload: IClick): DBRow => {
+/* const createDbRow = (payload: IClick): DBRow => {
   return {
     parent: {
       log_date: new Date(payload.timestamp),
@@ -119,4 +113,4 @@ const createDbRow = (payload: IClick): DBRow => {
       route_destination_protocol: payload.route.destination.protocol,
     },
   };
-};
+}; */
