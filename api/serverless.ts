@@ -31,17 +31,9 @@ const serverlessConfiguration: AWS = {
           },
           {
             Effect: "Allow",
-            Action: ["sqs:SendMessage"],
-            Resource: "arn:aws:sqs:*:*:${env:ENVIRONMENT}_click_event_s3",
-            principals: {
-              type: "*",
-              identifiers: ["*"],
-            },
-            condition: {
-              test: "ArnEquals",
-              variable: "aws:SourceArn",
-              values: ["arn:aws:s3:::swapstack-rebrandly-clickstream"],
-            },
+            Action: ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
+            Resource:
+              "arn:aws:sqs:${opt:region}:${aws:accountId}:${env:ENVIRONMENT}_click_event_s3_queue",
           },
         ],
       },
@@ -49,18 +41,18 @@ const serverlessConfiguration: AWS = {
   },
   functions: { process },
   package: { individually: true },
-  resources: {
-    Resources: {
-      clickEventS3Queue: {
-        Type: "AWS::SQS::Queue",
-        Properties: {
-          QueueName: "${env:ENVIRONMENT}_click_event_s3",
-          ReceiveMessageWaitTimeSeconds: 20,
-          VisibilityTimeout: 120, // seconds
-        },
-      },
-    },
-  },
+  // resources: {
+  //   Resources: {
+  //     clickEventS3Queue: {
+  //       Type: "AWS::SQS::Queue",
+  //       Properties: {
+  //         QueueName: "${env:ENVIRONMENT}_click_event_s3",
+  //         ReceiveMessageWaitTimeSeconds: 20,
+  //         VisibilityTimeout: 120, // seconds
+  //       },
+  //     },
+  //   },
+  // },
   custom: {
     prune: {
       automatic: true,
