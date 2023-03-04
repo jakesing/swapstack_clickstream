@@ -13,7 +13,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - swapstack-db:/var/lib/postgresql/data
+      - swapstack-db:/var/lib/mysql
 
 volumes:
   swapstack-db:
