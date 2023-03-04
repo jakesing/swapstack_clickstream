@@ -32,7 +32,7 @@ const serverlessConfiguration: AWS = {
           {
             Effect: "Allow",
             Action: ["sqs:SendMessage"],
-            Resource: "arn:aws:sqs:*:*:s3-event-notification-queue",
+            Resource: "arn:aws:sqs:*:*:${env:ENVIRONMENT}_click_event_s3",
             principals: {
               type: "*",
               identifiers: ["*"],
