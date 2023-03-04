@@ -1,0 +1,39 @@
+{
+  "Records": [
+    {
+      "eventVersion": "2.1",
+      "eventSource": "aws:s3",
+      "awsRegion": "us-east-1",
+      "eventTime": "2023-03-04T17:56:07.244Z",
+      "eventName": "ObjectCreated:Put",
+      "userIdentity": {
+        "principalId": "AWS:AROAJUK47U7VQ2UZ6T6BS:clickstream-to-s3-driver-master"
+      },
+      "requestParameters": {
+        "sourceIPAddress": "18.206.12.172"
+      },
+      "responseElements": {
+        "x-amz-request-id": "X5QAMDTXRB3YF72H",
+        "x-amz-id-2": "0K3g1BqM9QslAhJ3hNz1rEa1p14knvTm2TxvPC6+ZfVHCzmUWA73b3gwjAshRGEp1J3sx73zKSgTmiCLQTJVvVxQ+44JndOY"
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "tf-s3-queue-20230304174509952500000001",
+        "bucket": {
+          "name": "swapstack-rebrandly-clickstream",
+          "ownerIdentity": {
+            "principalId": "A3U0G662J5BBGH"
+          },
+          "arn": "arn:aws:s3:::swapstack-rebrandly-clickstream"
+        },
+        "object": {
+          "key": "/2023/03/04/17/rb-clicks-stream-1-2023-03-04-17-54-50-d2a29cd8-5d73-43a0-b03d-f1096408e2ca",
+          "size": 1063,
+          "eTag": "c6bf926391cbbd6d219d91a89f535b31",
+          "versionId": ".E6ynOLXnBEt1D1kN_cmKFAlPdt_P0c0",
+          "sequencer": "006403863732115317"
+        }
+      }
+    }
+  ]
+}
