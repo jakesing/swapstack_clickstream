@@ -1,9 +1,26 @@
 import { Knex } from "knex";
 
+import config from "../config/vars";
+
+const parentTableName = config.isRelease
+  ? "clickstream_events_parent"
+  : `${config.environment}_clickstream_events_parent`;
+
+const tableName = config.isRelease
+  ? "clickstream_events_child"
+  : `${config.environment}_clickstream_events_child`;
+
 export async function up(knex: Knex): Promise<void> {
-  return knex.schema.createTable("clickstream_events_child", (table) => {
+  return knex.schema.createTable(tableName, (table) => {
     table.increments("id").primary();
-    table.integer("id_parent");
+
+    table
+      .integer("id_parent")
+      .unsigned()
+      .index()
+      .references("id")
+      .inTable(parentTableName)
+      .onDelete("CASCADE");
     table.string("region");
     table.string("os_version");
     table.dateTime("session_start_date", { useTz: true });
@@ -20,12 +37,9 @@ export async function up(knex: Knex): Promise<void> {
     table.string("route_destination_protocol");
     table.dateTime("createdAt", { useTz: true }).defaultTo(knex.fn.now());
     table.dateTime("updatedAt", { useTz: true }).defaultTo(knex.fn.now());
-
-    table.foreign("id_parent").references("clickstream_events_parent.id");
-    table.index("id_parent");
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.dropTable("clickstream_events_child");
+  return knex.schema.dropTable(tableName);
 }

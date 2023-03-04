@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0.28
+    restart: always
+    environment:
+      - MYSQL_DATABASE=swapstack
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=gmh7kmain
+      - MYSQL_ROOT_PASSWORD=gmh7kmain
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    ports:
+      - "3306:3306"
+    volumes:
+      - swapstack-db:/var/lib/postgresql/data
+
+volumes:
+  swapstack-db:
