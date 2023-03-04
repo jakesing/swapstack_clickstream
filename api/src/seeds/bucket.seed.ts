@@ -30,7 +30,7 @@ export async function seed(knex: Knex): Promise<void> {
 
     const paths: string[] = await getFilePaths({
       bucket: config.bucket,
-      prefix: "/2023/03/01",
+      prefix: "/2023/03",
     });
 
     const limitedPromises = paths.map((path) => awsLimit(() => getParsedJSON(path)));
@@ -38,29 +38,12 @@ export async function seed(knex: Knex): Promise<void> {
     const data = result.flat();
     console.log("🚀 ~ file: bucket.seed.ts:42 ~ seed ~ data:", data.length);
 
-    /* const path: string =
-      // "/2023/02/03/10/rb-clicks-stream-1-2023-02-03-10-55-22-34141783-b76b-445c-969c-d85f440d032c";
-      "/2023/02/04/01/rb-clicks-stream-1-2023-02-04-01-04-05-8cbc6d1d-e8df-4cb3-a95e-f3129125dd3a";
-
-    const object = await getObject(config.bucket, path);
-    const contents = await object.Body.transformToString();
-    const repaired = JSON.parse(jsonrepair(contents));
-
-    let dbRows: DBRow[];
-    if (Array.isArray(repaired)) {
-      const payload: IClick[] = repaired;
-      dbRows = payload.map((row) => createDbRow(row));
-    } else {
-      const payload: IClick = repaired;
-      dbRows = [createDbRow(payload)];
-    } */
-
     await knex.transaction(async (trx) => {
       // insert all parents
 
       // Deletes ALL existing entries
-      // await knex(childTableName).del();
-      // await knex(parentTableName).del();
+      await knex(childTableName).del();
+      await knex(parentTableName).del();
 
       await Promise.all(
         data
