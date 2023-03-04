@@ -29,6 +29,20 @@ const serverlessConfiguration: AWS = {
             Action: ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectAcl", "s3:ListBucket"],
             Resource: "arn:aws:s3:::swapstack-rebrandly-clickstream/*",
           },
+          {
+            Effect: "Allow",
+            Action: ["sqs:SendMessage"],
+            Resource: "arn:aws:sqs:*:*:s3-event-notification-queue",
+            principals: {
+              type: "*",
+              identifiers: ["*"],
+            },
+            condition: {
+              test: "ArnEquals",
+              variable: "aws:SourceArn",
+              values: ["arn:aws:s3:::swapstack-rebrandly-clickstream"],
+            },
+          },
         ],
       },
     },
