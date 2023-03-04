@@ -5,23 +5,31 @@
   "main": "serverless.ts",
   "private": true,
   "scripts": {
+    "local:dev:db": "docker compose -f docker-compose.db.yml up -d",
+    "local:dev:db:down": "docker compose -f docker-compose.db.yml down",
     "dev": "npx serverless offline --stage dev --region us-east-1 --reloadHandler",
     "local:deploy": "npx serverless deploy --stage local --region us-east-1",
     "stage:deploy": "npx serverless deploy --stage stage --region us-east-1",
     "prettier:format": "prettier --write \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\"",
-    "prettier:check": "CI=true npx prettier \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\" --check"
+    "prettier:check": "CI=true npx prettier \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\" --check",
+    "migrate:latest": "npx knex migrate:latest",
+    "migrate:rollback": "npx knex migrate:rollback",
+    "migrate:make": "knex migrate:make -x ts"
   },
   "engines": {
     "node": ">=16"
   },
   "dependencies": {
     "@middy/core": "^4.2.6",
-    "@middy/do-not-wait-for-empty-event-loop": "^4.2.6"
+    "@middy/do-not-wait-for-empty-event-loop": "^4.2.6",
+    "knex": "^2.4.2",
+    "mysql2": "^3.2.0"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.27.0",
     "@types/aws-lambda": "^8.10.111",
-    "@types/node": "^18.14.5",
+    "@types/node": "^18.14.6",
+    "dotenv": "^16.0.3",
     "esbuild": "^0.16.17",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
