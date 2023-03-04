@@ -9,7 +9,7 @@ const processMessage = async (event: SQSEvent) => {
     const promises = event.Records.map(async (record: SQSRecord) => {
       try {
         const payload = JSON.parse(record.body);
-        console.log("🚀 ~ file: handler.ts:12 ~ promises ~ payload:", payload);
+        console.log("🚀 ~ file: handler.ts:12 ~ promises ~ payload:", JSON.stringify(payload));
 
         return null;
       } catch (error) {
