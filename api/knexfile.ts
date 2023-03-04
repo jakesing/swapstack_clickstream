@@ -18,12 +18,15 @@ const connection: Knex.MySqlConnectionConfig = {
 };
 
 const commonConfig = {
-  client: 'mysql2',
+  client: "mysql2",
   debug: true,
   useNullAsDefault: true,
   connection: connection,
   migrations: {
     directory: "./src/migrations",
+  },
+  seeds: {
+    directory: "./src/seeds",
   },
 };
 

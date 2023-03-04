@@ -25,15 +25,15 @@ export async function up(knex: Knex): Promise<void> {
     table.string("os_version");
     table.dateTime("session_start_date", { useTz: true });
     table.string("referrer_protocol");
-    table.string("referrer_path");
+    table.string("referrer_path", 4096);
     table.string("route_slash_tag");
     table.string("route_creator_id");
     table.string("route_creator_name");
     table.string("route_workspace_name");
     table.string("route_domain_id");
-    table.string("route_domain_raw");
+    table.string("route_domain_raw", 4096);
     table.string("route_domain_zone");
-    table.string("route_destination_raw");
+    table.string("route_destination_raw", 4096);
     table.string("route_destination_protocol");
     table.dateTime("createdAt", { useTz: true }).defaultTo(knex.fn.now());
     table.dateTime("updatedAt", { useTz: true }).defaultTo(knex.fn.now());
