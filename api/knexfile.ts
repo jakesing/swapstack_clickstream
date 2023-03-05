@@ -22,6 +22,7 @@ const commonConfig = {
   debug: true,
   useNullAsDefault: true,
   connection: connection,
+  pool: { min: 1, max: 20 },
   migrations: {
     directory: "./src/migrations",
   },

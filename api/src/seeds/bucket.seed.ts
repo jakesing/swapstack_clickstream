@@ -19,16 +19,19 @@ const childTableName = config.isRelease
 
 export async function seed(knex: Knex): Promise<void> {
   try {
-    const awsLimit = pLimit(100);
+    const awsLimit = pLimit(500);
     const dbLimit = pLimit(100);
 
     const paths: string[] = await getFilePaths({
       bucket: config.bucket,
-      prefix: "/2023/03",
+      prefix: "/2023/03/02",
     });
 
     const limitedPromises = paths.map((path) => awsLimit(() => getParsedJSON(path)));
-    const result = await Promise.all(limitedPromises);
+    const promiseResult = await Promise.allSettled(limitedPromises);
+    const result = promiseResult
+      .filter((row) => row.status === "fulfilled")
+      .map((row: any) => row?.value);
     const data = result.flat();
     console.log("🚀 ~ file: bucket.seed.ts:42 ~ seed ~ data:", data.length);
 
@@ -36,8 +39,8 @@ export async function seed(knex: Knex): Promise<void> {
       // insert all parents
 
       // Deletes ALL existing entries
-      await knex(childTableName).del();
-      await knex(parentTableName).del();
+      // await knex(childTableName).del();
+      // await knex(parentTableName).del();
 
       await Promise.all(
         data
@@ -77,6 +80,7 @@ const getParsedJSON = async (path: string): Promise<IClick[]> => {
     if (Array.isArray(repaired)) return repaired;
     else return [repaired];
   } catch (error) {
+    console.log("🚀 ~ file: bucket.seed.ts:81 ~ getParsedJSON ~ error:", error, path);
     throw error;
   }
 };

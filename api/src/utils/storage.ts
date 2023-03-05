@@ -24,22 +24,23 @@ export const getFilePaths = async ({
       Bucket: bucket,
     };
     if (marker) params.Marker = marker;
-    if (marker) params.Prefix = prefix;
+    if (prefix) params.Prefix = prefix;
 
     const command = new ListObjectsCommand(params);
     const data = await s3Client.send(command);
 
     const paths: string[] = data.Contents.map((row) => row.Key);
 
-    if (existingPaths) existingPaths.concat(paths);
+    if (existingPaths?.length) existingPaths.concat(paths);
+    else existingPaths = paths;
 
-    // if (data.IsTruncated) {
-    //   const length = data.Contents.length;
-    //   const marker = data.Contents[length - 1].Key;
-    //   return getFilePaths({ bucket, marker, existingPaths });
-    // }
+    if (data.IsTruncated) {
+      const length = data.Contents.length;
+      const marker = data.Contents[length - 1].Key;
+      return getFilePaths({ bucket, marker, existingPaths });
+    }
 
-    return paths;
+    return existingPaths;
   } catch (error) {
     throw error;
   }
