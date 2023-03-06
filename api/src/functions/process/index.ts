@@ -10,5 +10,11 @@ export default {
         batchSize: 10,
       },
     },
+    /* {
+      http: {
+        method: "get",
+        path: "sync",
+      },
+    }, */
   ],
 };

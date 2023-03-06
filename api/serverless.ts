@@ -20,6 +20,12 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       REGION: "${opt:region}",
       ENVIRONMENT: "${env:ENVIRONMENT}",
+      BUCKET: "${env:BUCKET}",
+      DB_HOST: "${env:DB_HOST}",
+      DB_PORT: "${env:DB_PORT}",
+      DB_USERNAME: "${env:DB_USERNAME}",
+      DB_PASSWORD: "${env:DB_PASSWORD}",
+      DB_NAME: "${env:DB_NAME}",
     },
     iam: {
       role: {
@@ -41,18 +47,6 @@ const serverlessConfiguration: AWS = {
   },
   functions: { process },
   package: { individually: true },
-  // resources: {
-  //   Resources: {
-  //     clickEventS3Queue: {
-  //       Type: "AWS::SQS::Queue",
-  //       Properties: {
-  //         QueueName: "${env:ENVIRONMENT}_click_event_s3",
-  //         ReceiveMessageWaitTimeSeconds: 20,
-  //         VisibilityTimeout: 120, // seconds
-  //       },
-  //     },
-  //   },
-  // },
   custom: {
     prune: {
       automatic: true,
@@ -62,7 +56,17 @@ const serverlessConfiguration: AWS = {
       bundle: true,
       minify: false,
       sourcemap: false,
-      exclude: ["aws-sdk"],
+      exclude: [
+        // "aws-sdk",
+        "mysql",
+        "better-sqlite3",
+        "tedious",
+        "oracledb",
+        "oracledb",
+        "pg",
+        "pg-query-stream",
+        "sqlite3",
+      ],
       target: "node16",
       define: { "require.resolve": undefined },
       platform: "node",

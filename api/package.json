@@ -12,10 +12,10 @@
     "stage:deploy": "npx serverless deploy --stage stage --region us-east-1",
     "prettier:format": "prettier --write \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\"",
     "prettier:check": "CI=true npx prettier \"src/**/*.{ts,jsx,js,css,json,css,scss,md}\" --check",
-    "migrate:latest": "npx knex migrate:latest",
-    "migrate:rollback": "npx knex migrate:rollback",
-    "migrate:make": "knex migrate:make -x ts",
-    "seed:run": "knex seed:run"
+    "migrate:latest": "npx knex migrate:latest --knexfile src/config/knexfile.ts",
+    "migrate:rollback": "npx knex migrate:rollback --knexfile src/config/knexfile.ts",
+    "migrate:make": "knex migrate:make -x ts --knexfile src/config/knexfile.ts",
+    "seed:run": "knex seed:run --knexfile src/config/knexfile.ts"
   },
   "engines": {
     "node": ">=16"
@@ -36,7 +36,7 @@
     "@types/node": "^18.14.6",
     "dotenv": "^16.0.3",
     "esbuild": "^0.16.17",
-    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-prettier": "^4.2.1",
     "p-limit": "^3.1.0",
     "prettier": "^2.8.4",

@@ -1,5 +1,22 @@
+import Knex, { Knex as KnexType } from "knex";
+
 import { IClick } from "../interfaces/IClicks";
 import IEventDBRow from "../interfaces/IEventDBRow";
+
+import config from "../config/vars";
+
+import knexFile from "../config/knexfile";
+
+let db = null;
+
+export const fetchDb = (): KnexType => {
+  if (!db) {
+    const dbConfig = knexFile[config.environment];
+    db = Knex(dbConfig);
+  }
+
+  return db;
+};
 
 export const createDbEventRow = (payload: IClick): IEventDBRow => {
   return {

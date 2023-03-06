@@ -24,7 +24,7 @@ export async function seed(knex: Knex): Promise<void> {
 
     const paths: string[] = await getFilePaths({
       bucket: config.bucket,
-      prefix: "/2023/03/02",
+      prefix: "/2023/03/03",
     });
 
     const limitedPromises = paths.map((path) => awsLimit(() => getParsedJSON(path)));
@@ -35,37 +35,35 @@ export async function seed(knex: Knex): Promise<void> {
     const data = result.flat();
     console.log("🚀 ~ file: bucket.seed.ts:42 ~ seed ~ data:", data.length);
 
-    await knex.transaction(async (trx) => {
-      // insert all parents
+    // await knex.transaction(async (trx) => {
+    // insert all parents
 
-      // Deletes ALL existing entries
-      // await knex(childTableName).del();
-      // await knex(parentTableName).del();
+    // Deletes ALL existing entries
+    // await knex(childTableName).del();
+    // await knex(parentTableName).del();
 
-      await Promise.all(
-        data
-          .map((row) => createDbEventRow(row))
-          .map((row) =>
-            dbLimit(async () => {
-              const parentId: number[] = await knex(parentTableName)
-                .insert(row.parent, "id")
-                .transacting(trx);
+    await Promise.all(
+      data
+        .map((row) => createDbEventRow(row))
+        .map((row) =>
+          dbLimit(async () => {
+            const parentId: number[] = await knex(parentTableName).insert(row.parent, "id");
+            // .transacting(trx);
 
-              await knex(childTableName)
-                .insert(
-                  {
-                    ...row.child,
-                    id_parent: parentId[0],
-                  },
-                  "id",
-                )
-                .transacting(trx);
-            }),
-          ),
-      );
+            await knex(childTableName).insert(
+              {
+                ...row.child,
+                id_parent: parentId[0],
+              },
+              "id",
+            );
+            // .transacting(trx);
+          }),
+        ),
+    );
 
-      return true;
-    });
+    return;
+    // });
   } catch (error) {
     throw error;
   }

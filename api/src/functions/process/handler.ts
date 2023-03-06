@@ -14,14 +14,16 @@ import * as eventsService from "../../services/event.service";
 
 import config from "../../config/vars";
 
+import * as dbUtils from "../../utils/db.helpers";
+
+// initialise db
+dbUtils.fetchDb();
+
 const processMessage = async (event: SQSEvent) => {
   try {
     // process each message
     const promises = event.Records.map(async (record: SQSRecord) => {
       try {
-        // const payload = JSON.parse(record.body);
-        // console.log("🚀 ~ file: handler.ts:12 ~ promises ~ payload:", JSON.stringify(payload));
-
         const result = await processRecord(record as unknown as S3EventRecord);
 
         return result;

@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 
-dotenv.config();
+// dotenv.config();
 
 const config = {
   region: process.env.REGION,
@@ -9,6 +9,11 @@ const config = {
   isLocal: process.env.ENVIRONMENT === "local",
   isStage: process.env.ENVIRONMENT === "stage",
   isRelease: process.env.ENVIRONMENT === "live",
+  dbHost: process.env.DB_HOST,
+  dbPort: +process.env.DB_PORT,
+  dbUsername: process.env.DB_USERNAME,
+  dbPassword: process.env.DB_PASSWORD,
+  dbName: process.env.DB_NAME,
 };
 
 export default config;
