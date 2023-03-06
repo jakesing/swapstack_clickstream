@@ -26,7 +26,8 @@ const processMessage = async (event: SQSEvent) => {
     const promises = event.Records.map(async (record: SQSRecord) => {
       console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", record);
       try {
-        const result = await processRecord(record as unknown as S3EventRecord);
+        const payload = JSON.parse(record.body);
+        const result = await processRecord(payload as unknown as S3EventRecord);
 
         return result;
       } catch (error) {
