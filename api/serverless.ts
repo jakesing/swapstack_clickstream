@@ -12,9 +12,9 @@ const serverlessConfiguration: AWS = {
     name: "aws",
     runtime: "nodejs16.x",
     architecture: "arm64",
-    memorySize: 1024,
+    memorySize: 512,
     timeout: 30, // 30 seconds
-    logRetentionInDays: 5,
+    logRetentionInDays: 3,
     stage: "${opt:stage}",
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
