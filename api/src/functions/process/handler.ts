@@ -21,6 +21,7 @@ dbUtils.fetchDb();
 
 const processMessage = async (event: SQSEvent) => {
   try {
+    console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", event.Records?.length);
     // process each message
     const promises = event.Records.map(async (record: SQSRecord) => {
       try {
@@ -44,16 +45,21 @@ const processMessage = async (event: SQSEvent) => {
 const processRecord = async (record: S3EventRecord): Promise<boolean> => {
   try {
     const path = record.s3.object.key;
+    console.log("🚀 ~ file: handler.ts:48 ~ processRecord ~ path:", path);
 
     const object = await getObject(config.bucket, path);
+    console.log("🚀 ~ file: handler.ts:51 ~ processRecord ~ object:", object);
     const contents = await object.Body.transformToString();
+    console.log("🚀 ~ file: handler.ts:53 ~ processRecord ~ contents:", contents);
     const repaired: IClick | IClick[] = JSON.parse(jsonrepair(contents));
+    console.log("🚀 ~ file: handler.ts:55 ~ processRecord ~ repaired:", repaired);
 
     let payload: IClick[] = [];
     if (Array.isArray(repaired)) payload = repaired;
     else payload.push(repaired);
 
     const rows: IEventDBRow[] = payload.map((row) => createDbEventRow(row));
+    console.log("🚀 ~ file: handler.ts:62 ~ processRecord ~ rows:", rows);
 
     await eventsService.logEvents(rows);
 
