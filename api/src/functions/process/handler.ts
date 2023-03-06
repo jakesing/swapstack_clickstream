@@ -1,4 +1,4 @@
-import type { S3Event, S3EventRecord, SQSRecord } from "aws-lambda";
+import type { S3Event, S3EventRecord, SQSRecord, SQSEvent } from "aws-lambda";
 import sqsBatch from "@middy/sqs-partial-batch-failure";
 import { jsonrepair } from "jsonrepair";
 
@@ -17,26 +17,36 @@ import * as dbUtils from "../../utils/db.helpers";
 // initialise db
 dbUtils.fetchDb();
 
-const processMessage = async (event: S3Event) => {
+const processMessage = async (event: SQSEvent) => {
   try {
     console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", JSON.stringify(event));
 
-    const promises = event.Records.map(async (record: S3EventRecord) => {
+    const promises = event.Records.map(async (record: SQSRecord) => {
       console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", JSON.stringify(record));
       try {
         console.log(
           "🚀 ~ file: handler.ts:30 ~ promises ~ payload:before",
-          JSON.parse(record as unknown as string)?.s3,
+          JSON.parse(record.body),
         );
       } catch (ignoredError) {}
       try {
         try {
-          console.log("🚀 ~ file: handler.ts:30 ~ promises ~ payload:after", record?.s3);
+          console.log(
+            "🚀 ~ file: handler.ts:30 ~ promises ~ payload:after",
+            JSON.parse(record.body)?.[0],
+          );
         } catch (ignoredError2) {}
 
-        const result = await processRecord(record as unknown as S3EventRecord);
+        const s3Records: S3Event = JSON.parse(record.body);
 
-        return result;
+        const promiseResult = await Promise.all(
+          s3Records.Records.map((s3Item: S3EventRecord) => processRecord(s3Item)),
+        );
+        console.log("🚀 ~ file: handler.ts:45 ~ promises ~ promiseResult:", promiseResult);
+
+        // const result = await processRecord(record as unknown as S3EventRecord);
+
+        return true;
       } catch (error) {
         console.error("🚀 ~ file: handler.ts:16 ~ promises ~ error", error);
 
