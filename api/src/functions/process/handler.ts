@@ -24,6 +24,7 @@ const processMessage = async (event: SQSEvent) => {
     console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", event.Records?.length);
     // process each message
     const promises = event.Records.map(async (record: SQSRecord) => {
+      console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", record);
       try {
         const result = await processRecord(record as unknown as S3EventRecord);
 
@@ -65,6 +66,7 @@ const processRecord = async (record: S3EventRecord): Promise<boolean> => {
 
     return true;
   } catch (error) {
+    console.error("🚀 ~ file: handler.ts:68 ~ processRecord ~ error:", error);
     throw error;
   }
 };
