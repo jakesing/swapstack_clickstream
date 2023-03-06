@@ -19,19 +19,23 @@ import * as dbUtils from "../../utils/db.helpers";
 // initialise db
 dbUtils.fetchDb();
 
-const processMessage = async (event: SQSRecord) => {
+const processMessage = async (event: SQSEvent) => {
   try {
     console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", JSON.stringify(event));
-    return Promise.resolve();
-    // console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", event.Records?.length);
-    // process each message
-    const payload: SQSEvent = JSON.parse(event.body);
-    console.log("🚀 ~ file: handler.ts:27 ~ processMessage ~ payload:", JSON.stringify(payload));
-    const promises = payload.Records.map(async (record: SQSRecord) => {
+
+    const promises = event.Records.map(async (record: SQSRecord) => {
+      console.log(
+        "🚀 ~ file: handler.ts:30 ~ promises ~ payload:before",
+        JSON.parse(record as unknown as string)?.s3,
+      );
       console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", JSON.stringify(record));
       try {
-        console.log("🚀 ~ file: handler.ts:30 ~ promises ~ payload:", JSON.stringify(payload));
-        const result = await processRecord(payload as unknown as S3EventRecord);
+        console.log(
+          "🚀 ~ file: handler.ts:30 ~ promises ~ payload:after",
+          JSON.parse(record as unknown as string)?.s3,
+        );
+
+        const result = await processRecord(record as unknown as S3EventRecord);
 
         return result;
       } catch (error) {
