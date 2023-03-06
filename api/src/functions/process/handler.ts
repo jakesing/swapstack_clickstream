@@ -21,6 +21,8 @@ dbUtils.fetchDb();
 
 const processMessage = async (event: SQSRecord) => {
   try {
+    console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", JSON.stringify(event));
+    return Promise.resolve();
     // console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", event.Records?.length);
     // process each message
     const payload: SQSEvent = JSON.parse(event.body);
