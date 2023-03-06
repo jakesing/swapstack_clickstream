@@ -46,6 +46,7 @@ const config: { [key: string]: Knex.Config } = {
   },
   stage: {
     ...commonConfig,
+    debug: false,
   },
   live: {
     ...commonConfig,
