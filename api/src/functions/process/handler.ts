@@ -12,8 +12,6 @@ import IEventDBRow from "../../interfaces/IEventDBRow";
 
 import * as eventsService from "../../services/event.service";
 
-import config from "../../config/vars";
-
 import * as dbUtils from "../../utils/db.helpers";
 
 // initialise db
@@ -24,16 +22,20 @@ const processMessage = async (event: SQSEvent) => {
     console.log("🚀 ~ file: handler.ts:23 ~ processMessage ~ event:", JSON.stringify(event));
 
     const promises = event.Records.map(async (record: SQSRecord) => {
-      console.log(
-        "🚀 ~ file: handler.ts:30 ~ promises ~ payload:before",
-        JSON.parse(record as unknown as string)?.s3,
-      );
-      console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", JSON.stringify(record));
       try {
         console.log(
-          "🚀 ~ file: handler.ts:30 ~ promises ~ payload:after",
+          "🚀 ~ file: handler.ts:30 ~ promises ~ payload:before",
           JSON.parse(record as unknown as string)?.s3,
         );
+      } catch (ignoredError) {}
+      console.log("🚀 ~ file: handler.ts:27 ~ promises ~ record:", JSON.stringify(record));
+      try {
+        try {
+          console.log(
+            "🚀 ~ file: handler.ts:30 ~ promises ~ payload:after",
+            JSON.parse(record as unknown as string)?.s3,
+          );
+        } catch (ignoredError2) {}
 
         const result = await processRecord(record as unknown as S3EventRecord);
 
@@ -57,7 +59,7 @@ const processRecord = async (record: S3EventRecord): Promise<boolean> => {
     const path = record.s3.object.key;
     console.log("🚀 ~ file: handler.ts:48 ~ processRecord ~ path:", path);
 
-    const object = await getObject(config.bucket, path);
+    const object = await getObject(record.s3.bucket.name, path);
     console.log("🚀 ~ file: handler.ts:51 ~ processRecord ~ object:", object);
     const contents = await object.Body.transformToString();
     console.log("🚀 ~ file: handler.ts:53 ~ processRecord ~ contents:", contents);
