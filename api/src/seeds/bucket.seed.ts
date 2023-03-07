@@ -19,12 +19,12 @@ const childTableName = config.isRelease
 
 export async function seed(knex: Knex): Promise<void> {
   try {
-    const awsLimit = pLimit(500);
-    const dbLimit = pLimit(100);
+    const awsLimit = pLimit(800);
+    const dbLimit = pLimit(300);
 
     const paths: string[] = await getFilePaths({
       bucket: config.bucket,
-      prefix: "/2023/03/03",
+      prefix: "/2023/03/06",
     });
 
     const limitedPromises = paths.map((path) => awsLimit(() => getParsedJSON(path)));
@@ -42,7 +42,7 @@ export async function seed(knex: Knex): Promise<void> {
     // await knex(childTableName).del();
     // await knex(parentTableName).del();
 
-    await Promise.all(
+    await Promise.allSettled(
       data
         .map((row) => createDbEventRow(row))
         .map((row) =>
