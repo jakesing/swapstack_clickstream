@@ -14,7 +14,7 @@
     "target": "ES2022",
     "outDir": "lib"
   },
-  "include": ["src/**/*.ts", "serverless.ts"],
+  "include": ["src/**/*.ts", "serverless.ts", "knexfile.ts"],
   "exclude": [
     "node_modules/**/*",
     ".serverless/**/*",
