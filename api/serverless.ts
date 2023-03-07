@@ -33,7 +33,7 @@ const serverlessConfiguration: AWS = {
           {
             Effect: "Allow",
             Action: ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectAcl", "s3:ListBucket"],
-            Resource: "arn:aws:s3:::swapstack-rebrandly-clickstream/*",
+            Resource: "arn:aws:s3:::swapstack-rebrandly-clickstream-96d8f37e/*",
           },
           {
             Effect: "Allow",

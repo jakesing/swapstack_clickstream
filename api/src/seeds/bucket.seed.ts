@@ -24,7 +24,7 @@ export async function seed(knex: Knex): Promise<void> {
 
     const paths: string[] = await getFilePaths({
       bucket: config.bucket,
-      prefix: "/2023/03/06",
+      prefix: "/2023/03/07",
     });
 
     const limitedPromises = paths.map((path) => awsLimit(() => getParsedJSON(path)));
