@@ -1,6 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 
 import process from "@functions/process";
+import analytics from "@functions/analytics";
 
 const serverlessConfiguration: AWS = {
   service: "swapstack-rebrandly-s3-parser",
@@ -11,6 +12,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: "aws",
     runtime: "nodejs16.x",
+    profile: "swapstack-jude",
     architecture: "arm64",
     memorySize: 512,
     timeout: 30, // 30 seconds
@@ -45,7 +47,7 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  functions: { process },
+  functions: { process, analytics },
   package: { individually: true },
   custom: {
     prune: {
