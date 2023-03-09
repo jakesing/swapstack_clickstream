@@ -39,7 +39,6 @@
     "date-fns": "^2.29.3",
     "date-fns-tz": "^2.0.0",
     "http-status": "^1.6.2",
-    "json-schema-to-ts": "^2.7.2",
     "jsonrepair": "^3.0.2",
     "knex": "^2.4.2",
     "mysql2": "^3.2.0",

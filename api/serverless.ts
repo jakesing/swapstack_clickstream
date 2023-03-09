@@ -12,7 +12,6 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: "aws",
     runtime: "nodejs16.x",
-    profile: "swapstack-jude",
     architecture: "arm64",
     memorySize: 512,
     timeout: 30, // 30 seconds
