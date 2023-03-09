@@ -1,19 +1,17 @@
+import type { Knex } from "knex";
+
 import IEventDBRow from "../interfaces/IEventDBRow";
 
 import * as dbUtils from "../utils/db.helpers";
 
-import config from "../config/vars";
+import * as systemConstants from "../constants/system";
 
-const parentTableName = config.isRelease
-  ? "clickstream_events_parent"
-  : `${config.environment}_clickstream_events_parent`;
+const parentTableName = "clickstream_events_parent";
+const childTableName = "clickstream_events_child";
 
-const childTableName = config.isRelease
-  ? "clickstream_events_child"
-  : `${config.environment}_clickstream_events_child`;
+import * as apiExceptions from "../exceptions/api";
 
 export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
-  console.log("🚀 ~ file: event.service.ts:16 ~ logEvents ~ rows:", rows.length);
   try {
     const knex = dbUtils.fetchDb();
 
@@ -38,6 +36,109 @@ export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
     );
 
     return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAnalytics = async ({
+  startDate,
+  endDate,
+  links = [],
+  groupByColumn = null,
+  groupByValue = null,
+}: {
+  startDate: Date;
+  endDate: Date;
+  links?: string[];
+  groupByColumn?: string;
+  groupByValue?: string;
+}) => {
+  try {
+    const knex = dbUtils.fetchDb();
+
+    const query: Knex.QueryBuilder = knex(parentTableName);
+
+    let groupByQuery: string;
+
+    switch (groupByColumn) {
+      case systemConstants.GROUP_BY_COLUMNS.DATE:
+        switch (groupByValue) {
+          case systemConstants.GROUP_BY_VALUES.YEAR:
+            groupByQuery = "DATE_FORMAT(log_date, '%Y')";
+            break;
+
+          case systemConstants.GROUP_BY_VALUES.MONTH:
+            groupByQuery = "DATE_FORMAT(log_date, '%M')";
+            break;
+
+          case systemConstants.GROUP_BY_VALUES.WEEK:
+            groupByQuery = "DATE_FORMAT(log_date, '%W')";
+            break;
+
+          case systemConstants.GROUP_BY_VALUES.DAY:
+            groupByQuery = "DATE_FORMAT(log_date, '%d')";
+            break;
+
+          case systemConstants.GROUP_BY_VALUES.HOUR:
+            groupByQuery = "DATE_FORMAT(log_date, '%k')";
+            break;
+
+          default:
+            throw apiExceptions.invalidGroupByClause;
+        }
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.COUNTRY:
+        groupByQuery = "country";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.OS:
+        groupByQuery = "os";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.LANGUAGE:
+        groupByQuery = "language";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.BROWSER:
+        groupByQuery = "browser";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.DEVICE:
+        groupByQuery = "device";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.REFERRER:
+        groupByQuery = "referrer";
+        break;
+
+      default:
+        break;
+    }
+
+    if (groupByQuery) {
+      query.select(
+        knex.raw(`${groupByQuery} as label`),
+        knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
+        knex.raw(
+          "SUM(CASE when agent_type = 'human' and is_first_session = 1 then 1 else 0 end) unique_clicks",
+        ),
+        knex.raw("SUM(CASE when agent_type = 'bot' then 1 else 0 end) bot_total"),
+        knex.raw(
+          "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
+        ),
+      );
+      query.groupByRaw(groupByQuery);
+    }
+
+    if (startDate) query.where("log_date", ">=", startDate);
+    if (endDate) query.andWhere("log_date", "<=", endDate);
+    if (links?.length > 0) query.whereIn("route_id", links);
+
+    const rows = await query;
+
+    return rows;
   } catch (error) {
     throw error;
   }

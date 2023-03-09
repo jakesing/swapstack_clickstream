@@ -1,12 +1,19 @@
 import type { AWS } from "@serverless/typescript";
 
 import process from "@functions/process";
+import analytics from "@functions/analytics";
 
 const serverlessConfiguration: AWS = {
   service: "swapstack-rebrandly-s3-parser",
   frameworkVersion: "3",
   configValidationMode: "error",
-  plugins: ["serverless-esbuild", "serverless-offline", "serverless-prune-plugin"],
+  plugins: [
+    "serverless-esbuild",
+    "serverless-offline",
+    "serverless-prune-plugin",
+    "serverless-api-gateway-throttling",
+    // "serverless-add-api-key",
+  ],
   useDotenv: true,
   provider: {
     name: "aws",
@@ -14,7 +21,7 @@ const serverlessConfiguration: AWS = {
     architecture: "arm64",
     memorySize: 512,
     timeout: 30, // 30 seconds
-    logRetentionInDays: 3,
+    logRetentionInDays: 1,
     stage: "${opt:stage}",
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
@@ -45,9 +52,20 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  functions: { process },
+  functions: { process, analytics },
   package: { individually: true },
   custom: {
+    apiGatewayThrottling: {
+      maxRequestsPerSecond: 200,
+      maxConcurrentRequests: 100,
+    },
+    /* apiKeys: [
+      {
+        name: "SwapstackAPIBasic",
+        deleteAtRemoval: true,
+        value: "${env:WEBSITE_API_KEY}",
+      },
+    ], */
     prune: {
       automatic: true,
       number: 3,
@@ -57,7 +75,6 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: false,
       exclude: [
-        // "aws-sdk",
         "mysql",
         "better-sqlite3",
         "tedious",
