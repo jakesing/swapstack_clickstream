@@ -7,6 +7,8 @@ export default {
       http: {
         method: "get",
         path: "analytics",
+        cors: true,
+        // private: true,
       },
     },
   ],
