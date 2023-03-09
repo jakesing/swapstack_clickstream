@@ -8,6 +8,7 @@ export default {
         method: "get",
         path: "analytics",
         cors: true,
+        memorySize: 1024,
         // private: true,
       },
     },
