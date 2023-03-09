@@ -9,7 +9,6 @@ pipelines:
       - step:
           name: Deploy API
           deployment: live
-          trigger: manual
           caches:
             - node
           script:
@@ -18,17 +17,6 @@ pipelines:
             - npx serverless deploy --stage $ENVIRONMENT --region $AWS_REGION
 
   custom:
-    remove-stage-api:
-      - step:
-          name: Remove Stage API
-          deployment: stage
-          caches:
-            - node
-          script:
-            - cd api
-            - npm ci
-            - npx serverless remove --stage $ENVIRONMENT --region $AWS_REGION
-
     remove-live-api:
       - step:
           name: Remove Stage API
