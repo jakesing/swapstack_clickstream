@@ -6,7 +6,7 @@ import cors from "@middy/http-cors";
 import httpSecurityHeaders from "@middy/http-security-headers";
 import middyJsonBodyParser from "@middy/http-json-body-parser";
 
-import customResponseMiddleware from "../middlewares/response";
+import customResponseMiddleware from "../middlewares/response.middleware";
 
 export const middyfy = (handler?: Handler) =>
   middy(handler).use(doNotWaitForEmptyEventLoop()).use(errorLogger());

@@ -89,23 +89,48 @@ export const fetchAnalytics = async ({
         }
         break;
 
+      case systemConstants.GROUP_BY_COLUMNS.COUNTRY:
+        groupByQuery = "country";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.OS:
+        groupByQuery = "os";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.LANGUAGE:
+        groupByQuery = "language";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.BROWSER:
+        groupByQuery = "browser";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.DEVICE:
+        groupByQuery = "device";
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.REFERRER:
+        groupByQuery = "referrer";
+        break;
+
       default:
         break;
     }
 
-    query.select(
-      knex.raw(`${groupByQuery} as date`),
-      knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
-      knex.raw(
-        "SUM(CASE when agent_type = 'human' and is_first_session = 1 then 1 else 0 end) unique_clicks",
-      ),
-      knex.raw("SUM(CASE when agent_type = 'bot' then 1 else 0 end) bot_total"),
-      knex.raw(
-        "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
-      ),
-    );
-
-    query.groupByRaw(groupByQuery);
+    if (groupByQuery) {
+      query.select(
+        knex.raw(`${groupByQuery} as label`),
+        knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
+        knex.raw(
+          "SUM(CASE when agent_type = 'human' and is_first_session = 1 then 1 else 0 end) unique_clicks",
+        ),
+        knex.raw("SUM(CASE when agent_type = 'bot' then 1 else 0 end) bot_total"),
+        knex.raw(
+          "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
+        ),
+      );
+      query.groupByRaw(groupByQuery);
+    }
 
     if (startDate) query.where("log_date", ">=", startDate);
     if (endDate) query.andWhere("log_date", "<=", endDate);

@@ -1,8 +1,11 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { zonedTimeToUtc, toDate } from "date-fns-tz";
 import { parse, isValid } from "date-fns";
+import * as Yup from "yup";
 
 import { middyfyApi } from "@libs/lambda";
+
+import schemaValidator from "../../middlewares/validator.middleware";
 
 import * as apiExceptions from "../../exceptions/api";
 
@@ -29,18 +32,7 @@ const process = async (event: APIGatewayProxyEvent) => {
       multiValueQueryStringParameters: { links = [] },
     } = event;
 
-    if (!startDate) throw apiExceptions.missingStartDate;
-    if (groupByColumn && groupByValue) {
-      switch (groupByColumn) {
-        case systemConstants.GROUP_BY_COLUMNS.DATE:
-          if (!Object.keys(systemConstants.GROUP_BY_VALUES).includes(groupByValue))
-            throw apiExceptions.invalidGroupByClause;
-          break;
-
-        default:
-          throw apiExceptions.invalidGroupByClause;
-      }
-    }
+    if (groupByValue && !groupByColumn) throw apiExceptions.missingGroupByColumnClause;
 
     const now: Date = new Date();
 
@@ -82,4 +74,28 @@ const process = async (event: APIGatewayProxyEvent) => {
   }
 };
 
-export const main = middyfyApi(process);
+export const main = middyfyApi(process).use([
+  schemaValidator({
+    queryStringParameters: Yup.object({
+      startDate: Yup.string().required().trim(),
+      timezone: Yup.string().required().trim(),
+      endDate: Yup.string().default(null).nullable(),
+      groupByColumn: Yup.string()
+        .default(null)
+        .nullable()
+        .oneOf(Object.values(systemConstants.GROUP_BY_COLUMNS)),
+      groupByValue: Yup.string()
+        .oneOf(Object.values(systemConstants.GROUP_BY_VALUES))
+        .when("groupByColumn", {
+          is: (val: string) => !!val && systemConstants.GROUP_BY_COLUMNS.DATE === val,
+          then: (schema) => schema.required().trim(),
+          otherwise: (schema) => schema.default(null).nullable(),
+        }),
+    })
+      .required()
+      .noUnknown(true),
+    multiValueQueryStringParameters: Yup.object({
+      links: Yup.array().of(Yup.string()).optional().default([]),
+    }).noUnknown(true),
+  }),
+]);
