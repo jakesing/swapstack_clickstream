@@ -1,6 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 
 import process from "@functions/process";
+import analytics from "@functions/analytics";
 
 const serverlessConfiguration: AWS = {
   service: "swapstack-rebrandly-s3-parser",
@@ -33,7 +34,7 @@ const serverlessConfiguration: AWS = {
           {
             Effect: "Allow",
             Action: ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectAcl", "s3:ListBucket"],
-            Resource: "arn:aws:s3:::swapstack-rebrandly-clickstream-96d8f37e/*",
+            Resource: "arn:aws:s3:::${env:BUCKET}/*",
           },
           {
             Effect: "Allow",
@@ -45,7 +46,7 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  functions: { process },
+  functions: { process, analytics },
   package: { individually: true },
   custom: {
     prune: {
