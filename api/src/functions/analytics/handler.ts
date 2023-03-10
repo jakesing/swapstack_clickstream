@@ -1,35 +1,29 @@
-import type { APIGatewayProxyEvent } from "aws-lambda";
-import { zonedTimeToUtc, toDate } from "date-fns-tz";
 import { parse, isValid } from "date-fns";
-import * as Yup from "yup";
 
 import { middyfyApi } from "@libs/lambda";
+import { ValidatedAPIGatewayProxyEvent } from "@libs/api-gateway";
 
 import schemaValidator from "../../middlewares/validator.middleware";
 
 import * as apiExceptions from "../../exceptions/api";
 
+import IAnalyticsApis from "../../interfaces/api/IAnalyticsApi";
+
 import * as eventsService from "../../services/event.service";
 
 import * as dbUtils from "../../utils/db.helpers";
-import * as systemConstants from "../../constants/system";
 
-const DATE_FORMAT = "MM/dd/yyyy HH:mm";
+import { analyticsBodySchema } from "./schema";
+
+const DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
 
 // initialise db
 dbUtils.fetchDb();
 
-const process = async (event: APIGatewayProxyEvent) => {
+const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => {
   try {
     const {
-      queryStringParameters: {
-        startDate,
-        endDate,
-        timezone,
-        groupByColumn = null,
-        groupByValue = null,
-      },
-      multiValueQueryStringParameters: { links = [] },
+      body: { startDate, endDate, groupByColumn = null, groupByValue = null, links = [] },
     } = event;
 
     if (groupByValue && !groupByColumn) throw apiExceptions.missingGroupByColumnClause;
@@ -37,20 +31,10 @@ const process = async (event: APIGatewayProxyEvent) => {
     const now: Date = new Date();
 
     let parsedEndDate: Date = null;
-    const parsedStartDate: Date = zonedTimeToUtc(
-      toDate(parse(startDate, DATE_FORMAT, now), {
-        timeZone: timezone,
-      }),
-      timezone,
-    );
+    const parsedStartDate: Date = parse(startDate, DATE_FORMAT, now);
     if (endDate) {
       // parse end date and ensure it is after start date
-      parsedEndDate = zonedTimeToUtc(
-        toDate(parse(endDate, DATE_FORMAT, now), {
-          timeZone: timezone,
-        }),
-        timezone,
-      );
+      parsedEndDate = parse(endDate, DATE_FORMAT, now);
 
       if (parsedStartDate.getTime() > parsedEndDate.getTime())
         throw apiExceptions.startTimeAfterEndTimeError;
@@ -76,26 +60,6 @@ const process = async (event: APIGatewayProxyEvent) => {
 
 export const main = middyfyApi(process).use([
   schemaValidator({
-    queryStringParameters: Yup.object({
-      startDate: Yup.string().required().trim(),
-      timezone: Yup.string().required().trim(),
-      endDate: Yup.string().default(null).nullable(),
-      groupByColumn: Yup.string()
-        .default(null)
-        .nullable()
-        .oneOf(Object.values(systemConstants.GROUP_BY_COLUMNS)),
-      groupByValue: Yup.string()
-        .oneOf(Object.values(systemConstants.GROUP_BY_VALUES))
-        .when("groupByColumn", {
-          is: (val: string) => !!val && systemConstants.GROUP_BY_COLUMNS.DATE === val,
-          then: (schema) => schema.required().trim(),
-          otherwise: (schema) => schema.default(null).nullable(),
-        }),
-    })
-      .required()
-      .noUnknown(true),
-    multiValueQueryStringParameters: Yup.object({
-      links: Yup.array().of(Yup.string()).optional().default([]),
-    }).noUnknown(true),
+    body: analyticsBodySchema,
   }),
 ]);
