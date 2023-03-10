@@ -68,6 +68,10 @@ export const fetchAnalytics = async ({
             groupByQuery = "YEAR(log_date)";
             break;
 
+          case systemConstants.GROUP_BY_VALUES.QUARTER:
+            groupByQuery = "QUARTER(log_date)";
+            break;
+
           case systemConstants.GROUP_BY_VALUES.MONTH:
             groupByQuery = "MONTH(log_date)";
             break;
@@ -126,20 +130,23 @@ export const fetchAnalytics = async ({
     }
 
     if (groupByQuery) {
-      query.select(
-        // knex.raw(`count(*) as total`),
-        knex.raw(`${groupByQuery} as label`),
-        knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
-        knex.raw(
-          "SUM(CASE when agent_type = 'human' and is_first_session = 1 then 1 else 0 end) unique_clicks",
-        ),
-        knex.raw("SUM(CASE when agent_type = 'bot' then 1 else 0 end) bot_total"),
-        knex.raw(
-          "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
-        ),
-      );
       query.groupByRaw(groupByQuery).orderByRaw(`${groupByQuery} DESC`);
+    } else {
+      groupByQuery = "COUNT(*)";
     }
+
+    query.select(
+      // knex.raw(`count(*) as total`),
+      knex.raw(`${groupByQuery} as label`),
+      knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
+      knex.raw(
+        "SUM(CASE when agent_type = 'human' and is_first_session = 1 then 1 else 0 end) unique_clicks",
+      ),
+      knex.raw("SUM(CASE when agent_type = 'bot' then 1 else 0 end) bot_total"),
+      knex.raw(
+        "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
+      ),
+    );
 
     if (startDate) query.where("log_date", ">=", startDate);
     if (endDate) query.andWhere("log_date", "<=", endDate);

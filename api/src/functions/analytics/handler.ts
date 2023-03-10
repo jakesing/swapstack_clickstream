@@ -23,10 +23,10 @@ dbUtils.fetchDb();
 const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => {
   try {
     const {
-      body: { startDate, endDate, groupByColumn = null, groupByValue = null, links = [] },
+      body: { startDate, endDate, groupByColumn = null, dateGrouping = null, links = [] },
     } = event;
 
-    if (groupByValue && !groupByColumn) throw apiExceptions.missingGroupByColumnClause;
+    if (dateGrouping && !groupByColumn) throw apiExceptions.missingGroupByColumnClause;
 
     const now: Date = new Date();
 
@@ -48,7 +48,7 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
       endDate: parsedEndDate,
       links: links as string[],
       groupByColumn,
-      groupByValue,
+      groupByValue: dateGrouping,
     });
 
     return result;
