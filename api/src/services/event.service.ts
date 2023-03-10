@@ -65,28 +65,36 @@ export const fetchAnalytics = async ({
       case systemConstants.GROUP_BY_COLUMNS.DATE:
         switch (groupByValue) {
           case systemConstants.GROUP_BY_VALUES.YEAR:
-            groupByQuery = "DATE_FORMAT(log_date, '%Y')";
+            groupByQuery = "YEAR(log_date)";
             break;
 
           case systemConstants.GROUP_BY_VALUES.MONTH:
-            groupByQuery = "DATE_FORMAT(log_date, '%M')";
+            groupByQuery = "MONTH(log_date)";
             break;
 
           case systemConstants.GROUP_BY_VALUES.WEEK:
-            groupByQuery = "DATE_FORMAT(log_date, '%W')";
+            groupByQuery = "WEEK(log_date)";
             break;
 
           case systemConstants.GROUP_BY_VALUES.DAY:
-            groupByQuery = "DATE_FORMAT(log_date, '%d')";
+            groupByQuery = "DAY(log_date)";
+            break;
+
+          case systemConstants.GROUP_BY_VALUES.DATE:
+            groupByQuery = "DATE(log_date)";
             break;
 
           case systemConstants.GROUP_BY_VALUES.HOUR:
-            groupByQuery = "DATE_FORMAT(log_date, '%k')";
+            groupByQuery = "HOUR(log_date)";
             break;
 
           default:
             throw apiExceptions.invalidGroupByClause;
         }
+        break;
+
+      case systemConstants.GROUP_BY_COLUMNS.LINKS:
+        groupByQuery = "route_id";
         break;
 
       case systemConstants.GROUP_BY_COLUMNS.COUNTRY:
@@ -119,6 +127,7 @@ export const fetchAnalytics = async ({
 
     if (groupByQuery) {
       query.select(
+        // knex.raw(`count(*) as total`),
         knex.raw(`${groupByQuery} as label`),
         knex.raw("SUM(CASE when agent_type = 'human' then 1 else 0 end) total_clicks"),
         knex.raw(
@@ -129,7 +138,7 @@ export const fetchAnalytics = async ({
           "SUM(CASE when agent_type = 'bot' and is_first_session = 1 then 1 else 0 end) bot_unique",
         ),
       );
-      query.groupByRaw(groupByQuery);
+      query.groupByRaw(groupByQuery).orderByRaw(`${groupByQuery} DESC`);
     }
 
     if (startDate) query.where("log_date", ">=", startDate);

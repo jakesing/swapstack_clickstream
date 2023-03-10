@@ -6,10 +6,10 @@ export default {
   events: [
     {
       http: {
-        method: "get",
+        method: "post",
         path: "analytics",
         cors: true,
-        // private: true,
+        private: true,
       },
     },
   ],

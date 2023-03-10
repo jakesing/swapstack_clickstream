@@ -1,6 +1,6 @@
 import Knex, { Knex as KnexType } from "knex";
 
-import { IClick } from "../interfaces/IClicks";
+import { IClick, Tags } from "../interfaces/IClicks";
 import IEventDBRow from "../interfaces/IEventDBRow";
 
 import config from "../config/vars";
@@ -19,6 +19,20 @@ export const fetchDb = (): KnexType => {
 };
 
 export const createDbEventRow = (payload: IClick): IEventDBRow => {
+  let tag_id: string = null;
+  let tag_value: string = null;
+
+  // save tag if it exists
+  const tags: Tags = payload.route?.tags;
+  if (tags && Object.keys(tags)?.length) {
+    // tags exist, pick the first one
+    const key: string = Object.keys(tags)?.[0];
+    if (key) {
+      tag_id = key;
+      tag_value = tags[key]?.value || null;
+    }
+  }
+
   return {
     parent: {
       log_date: new Date(payload.timestamp),
@@ -48,6 +62,8 @@ export const createDbEventRow = (payload: IClick): IEventDBRow => {
       route_domain_zone: payload.route.domain?.zone,
       route_destination_raw: payload.route.destination?.raw,
       route_destination_protocol: payload.route.destination?.protocol,
+      tag_id,
+      tag_value,
     },
   };
 };
