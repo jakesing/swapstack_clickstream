@@ -12,7 +12,7 @@ const serverlessConfiguration: AWS = {
     "serverless-offline",
     "serverless-prune-plugin",
     "serverless-api-gateway-throttling",
-    // "serverless-add-api-key",
+    "serverless-add-api-key",
   ],
   useDotenv: true,
   provider: {
@@ -59,13 +59,13 @@ const serverlessConfiguration: AWS = {
       maxRequestsPerSecond: 200,
       maxConcurrentRequests: 100,
     },
-    /* apiKeys: [
+    apiKeys: [
       {
         name: "SwapstackAPIBasic",
         deleteAtRemoval: true,
         value: "${env:WEBSITE_API_KEY}",
       },
-    ], */
+    ],
     prune: {
       automatic: true,
       number: 3,

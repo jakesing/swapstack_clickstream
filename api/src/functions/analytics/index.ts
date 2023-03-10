@@ -9,7 +9,7 @@ export default {
         method: "post",
         path: "analytics",
         cors: true,
-        // private: true,
+        private: true,
       },
     },
   ],
