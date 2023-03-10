@@ -58,6 +58,7 @@ export interface Route {
   creator: Creator;
   domain: Domain;
   destination: Destination;
+  tags: Tags;
 }
 
 export interface Creator {
@@ -77,6 +78,13 @@ export interface Destination {
   hostname: string;
   path: string;
   params: Params;
+}
+
+export interface Tags {
+  [key: string]: {
+    value: string;
+    version: string;
+  };
 }
 
 export interface Params {

@@ -15,4 +15,6 @@ export default interface IClickStreamEventChild {
   route_domain_zone: string;
   route_destination_raw: string;
   route_destination_protocol: string;
+  tag_id: string;
+  tag_value: string;
 }
