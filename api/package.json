@@ -37,7 +37,6 @@
     "@middy/http-security-headers": "^4.2.6",
     "@middy/sqs-partial-batch-failure": "^4.2.6",
     "date-fns": "^2.29.3",
-    "date-fns-tz": "^2.0.0",
     "http-status": "^1.6.2",
     "jsonrepair": "^3.0.2",
     "knex": "^2.4.2",

@@ -6,6 +6,7 @@ export enum GROUP_BY_COLUMNS {
   BROWSER = "browser",
   DEVICE = "device",
   REFERRER = "referrer",
+  LINKS = "links",
 }
 
 export enum GROUP_BY_VALUES {
@@ -13,5 +14,6 @@ export enum GROUP_BY_VALUES {
   MONTH = "month",
   WEEK = "week",
   DAY = "day",
+  DATE = "date",
   HOUR = "hour",
 }
