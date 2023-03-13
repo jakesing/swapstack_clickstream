@@ -11,6 +11,7 @@ export enum GROUP_BY_COLUMNS {
 
 export enum GROUP_BY_VALUES {
   YEAR = "year",
+  QUARTER = "quarter",
   MONTH = "month",
   WEEK = "week",
   DAY = "day",

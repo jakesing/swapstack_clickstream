@@ -6,10 +6,10 @@ export const analyticsBodySchema = Yup.object({
   startDate: Yup.string().required().trim(),
   endDate: Yup.string().default(null).nullable(),
   groupByColumn: Yup.string()
-    .required()
-    .trim()
+    .default(null)
+    .nullable()
     .oneOf(Object.values(systemConstants.GROUP_BY_COLUMNS)),
-  groupByValue: Yup.string()
+  dateGrouping: Yup.string()
     .oneOf(Object.values(systemConstants.GROUP_BY_VALUES))
     .when("groupByColumn", {
       is: (val: string) => !!val && systemConstants.GROUP_BY_COLUMNS.DATE === val,
