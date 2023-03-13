@@ -152,7 +152,22 @@ export const fetchAnalytics = async ({
     if (endDate) query.andWhere("log_date", "<=", endDate);
     if (links?.length > 0) query.whereIn("route_id", links);
 
-    const rows = await query;
+    let rows = await query;
+
+    if (rows?.length === 1) {
+      const row = rows?.[0];
+
+      if (`${row?.label}` === "0")
+        rows = [
+          {
+            label: 0,
+            total_clicks: "0",
+            unique_clicks: "0",
+            bot_total: "0",
+            bot_unique: "0",
+          },
+        ];
+    }
 
     return rows;
   } catch (error) {
