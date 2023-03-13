@@ -6,7 +6,7 @@ export enum GROUP_BY_COLUMNS {
   BROWSER = "browser",
   DEVICE = "device",
   REFERRER = "referrer",
-  LINKS = "links",
+  LINKS = "link",
 }
 
 export enum GROUP_BY_VALUES {
