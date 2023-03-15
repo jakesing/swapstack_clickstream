@@ -1,6 +1,7 @@
 export default interface IClickStreamEventParent {
   id?: number;
   log_date: Date;
+  log_date_unix: number;
   language: string;
   country: string;
   agent_type: string;

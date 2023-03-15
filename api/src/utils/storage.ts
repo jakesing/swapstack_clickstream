@@ -1,6 +1,6 @@
 import {
-  ListObjectsCommand,
-  ListObjectsCommandInput,
+  ListObjectsV2CommandInput,
+  ListObjectsV2Command,
   GetObjectCommand,
   GetObjectCommandInput,
   GetObjectCommandOutput,
@@ -10,37 +10,30 @@ import { s3Client } from "../config/aws";
 
 export const getFilePaths = async ({
   bucket,
-  marker,
   prefix,
-  existingPaths,
 }: {
   bucket: string;
-  marker?: string;
   prefix?: string;
-  existingPaths?: string[];
 }): Promise<string[]> => {
   try {
-    const params: ListObjectsCommandInput = {
+    const params: ListObjectsV2CommandInput = {
       Bucket: bucket,
     };
-    if (marker) params.Marker = marker;
     if (prefix) params.Prefix = prefix;
 
-    const command = new ListObjectsCommand(params);
-    const data = await s3Client.send(command);
+    let isTruncated = true;
+    let paths: string[] = [];
 
-    const paths: string[] = data.Contents.map((row) => row.Key);
+    let command = new ListObjectsV2Command(params);
 
-    if (existingPaths?.length) existingPaths.concat(paths);
-    else existingPaths = paths;
-
-    if (data.IsTruncated) {
-      const length = data.Contents.length;
-      const marker = data.Contents[length - 1].Key;
-      return getFilePaths({ bucket, marker, existingPaths });
+    while (isTruncated) {
+      const { Contents, IsTruncated, NextContinuationToken } = await s3Client.send(command);
+      paths.push(...Contents.map((row) => row.Key));
+      isTruncated = IsTruncated;
+      command.input.ContinuationToken = NextContinuationToken;
     }
 
-    return existingPaths;
+    return paths;
   } catch (error) {
     throw error;
   }
