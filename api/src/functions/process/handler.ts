@@ -55,8 +55,8 @@ const processRecord = async (record: S3EventRecord): Promise<boolean> => {
 
     const rows: IEventDBRow[] = payload.map((row) => createDbEventRow(row));
 
-    const insertedIds: number[] = await eventsService.logEvents(rows);
-    console.log("PROCESS ==> key = ", path, "ids = ", JSON.stringify(insertedIds));
+    await eventsService.logEvents(rows);
+    // console.log("PROCESS ==> key = ", path, "ids = ", JSON.stringify(insertedIds));
 
     return true;
   } catch (error) {
