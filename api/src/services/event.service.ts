@@ -11,14 +11,17 @@ const childTableName = "clickstream_events_child";
 
 import * as apiExceptions from "../exceptions/api";
 
-export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
+export const logEvents = async (rows: IEventDBRow[]): Promise<number[]> => {
   try {
     const knex = dbUtils.fetchDb();
 
+    const ids: number[] = [];
     await Promise.all(
       rows.map(async (row) => {
         try {
           const parentId: number[] = await knex(parentTableName).insert(row.parent, "id");
+
+          ids.push(parentId[0]);
 
           await knex(childTableName).insert(
             {
@@ -35,7 +38,7 @@ export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
       }),
     );
 
-    return true;
+    return ids;
   } catch (error) {
     throw error;
   }
@@ -65,31 +68,31 @@ export const fetchAnalytics = async ({
       case systemConstants.GROUP_BY_COLUMNS.DATE:
         switch (groupByValue) {
           case systemConstants.GROUP_BY_VALUES.YEAR:
-            groupByQuery = "YEAR(log_date)";
+            groupByQuery = "YEAR(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.QUARTER:
-            groupByQuery = "QUARTER(log_date)";
+            groupByQuery = "QUARTER(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.MONTH:
-            groupByQuery = "MONTH(log_date)";
+            groupByQuery = "MONTH(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.WEEK:
-            groupByQuery = "WEEK(log_date)";
+            groupByQuery = "WEEK(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.DAY:
-            groupByQuery = "DAY(log_date)";
+            groupByQuery = "DAY(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.DATE:
-            groupByQuery = "DATE(log_date)";
+            groupByQuery = "DATE(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.HOUR:
-            groupByQuery = "HOUR(log_date)";
+            groupByQuery = "HOUR(FROM_UNIXTIME(log_date_unix))";
             break;
 
           default:
@@ -148,8 +151,8 @@ export const fetchAnalytics = async ({
       ),
     );
 
-    if (startDate) query.where("log_date", ">=", startDate);
-    if (endDate) query.andWhere("log_date", "<=", endDate);
+    if (startDate) query.where("log_date_unix", ">=", startDate.getTime() / 1000);
+    if (endDate) query.andWhere("log_date_unix", "<=", endDate.getTime() / 1000);
     if (links?.length > 0) query.whereIn("route_id", links);
 
     let rows = await query;
