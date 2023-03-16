@@ -48,12 +48,16 @@ export const fetchAnalytics = async ({
   startDate,
   endDate,
   links = [],
+  tags = [],
+  workspaces = [],
   groupByColumn = null,
   groupByValue = null,
 }: {
   startDate: Date;
   endDate: Date;
+  tags?: string[];
   links?: string[];
+  workspaces?: string[];
   groupByColumn?: string;
   groupByValue?: string;
 }) => {
@@ -154,6 +158,14 @@ export const fetchAnalytics = async ({
     if (startDate) query.where("log_date_unix", ">=", startDate.getTime() / 1000);
     if (endDate) query.andWhere("log_date_unix", "<=", endDate.getTime() / 1000);
     if (links?.length > 0) query.whereIn("route_id", links);
+
+    if (tags?.length > 0 || workspaces?.length > 0) {
+      // join the child table as well
+      query.leftJoin(childTableName, `${parentTableName}.id`, `${childTableName}.id_parent`);
+
+      if (tags?.length > 0) query.whereIn("tag_id", tags);
+      if (workspaces?.length > 0) query.whereIn("route_workspace_id", workspaces);
+    }
 
     let rows = await query;
 

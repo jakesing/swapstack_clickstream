@@ -17,6 +17,8 @@ export const analyticsBodySchema = Yup.object({
       otherwise: (schema) => schema.default(null).nullable(),
     }),
   links: Yup.array().of(Yup.string()).default([]),
+  tags: Yup.array().of(Yup.string()).default([]),
+  workspaces: Yup.array().of(Yup.string()).default([]),
 })
   .required()
   .noUnknown(true);

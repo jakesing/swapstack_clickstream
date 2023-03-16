@@ -63,6 +63,7 @@ export const createDbEventRow = (payload: IClick): IEventDBRow => {
       route_slash_tag: payload.route?.slashtag,
       route_creator_id: payload.route?.creator?.id,
       route_creator_name: payload.route?.creator?.name,
+      route_workspace_id: payload.route?.creator?.workspace?.id,
       route_workspace_name: payload.route?.creator?.workspace?.name,
       route_domain_id: payload.route?.domain?.id,
       route_domain_raw: payload.route?.domain?.raw,
