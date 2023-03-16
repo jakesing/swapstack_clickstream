@@ -11,14 +11,17 @@ const childTableName = "clickstream_events_child";
 
 import * as apiExceptions from "../exceptions/api";
 
-export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
+export const logEvents = async (rows: IEventDBRow[]): Promise<number[]> => {
   try {
     const knex = dbUtils.fetchDb();
 
+    const ids: number[] = [];
     await Promise.all(
       rows.map(async (row) => {
         try {
           const parentId: number[] = await knex(parentTableName).insert(row.parent, "id");
+
+          ids.push(parentId[0]);
 
           await knex(childTableName).insert(
             {
@@ -35,7 +38,7 @@ export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
       }),
     );
 
-    return true;
+    return ids;
   } catch (error) {
     throw error;
   }
