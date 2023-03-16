@@ -1,10 +1,10 @@
 import type { Knex } from "knex";
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 import * as path from "path";
 
-dotenv.config({
-  path: path.join(__dirname, "../../.env"),
-});
+// dotenv.config({
+//   path: path.join(__dirname, "../../.env"),
+// });
 
 const HOST: string = process.env.DB_HOST;
 const PORT: number = +process.env.DB_PORT;
@@ -42,16 +42,14 @@ const commonConfig = {
 const config: { [key: string]: Knex.Config } = {
   local: {
     ...commonConfig,
-    pool: { min: 2, max: 65 },
+    pool: { min: 2, max: 20 },
   },
   stage: {
     ...commonConfig,
-    pool: { min: 2, max: 65 },
     debug: false,
   },
   live: {
     ...commonConfig,
-    pool: { min: 2, max: 65 },
     debug: false,
   },
 };

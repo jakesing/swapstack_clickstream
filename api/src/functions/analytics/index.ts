@@ -8,8 +8,8 @@ export default {
       http: {
         method: "post",
         path: "analytics",
-        // cors: true,
-        // private: true,
+        cors: true,
+        private: true,
       },
     },
   ],
