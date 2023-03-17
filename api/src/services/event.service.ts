@@ -137,7 +137,7 @@ export const fetchAnalytics = async ({
     }
 
     if (groupByQuery) {
-      query.groupByRaw(groupByQuery).orderByRaw(`${groupByQuery} DESC`);
+      query.groupByRaw(groupByQuery);
     } else {
       groupByQuery = "COUNT(*)";
     }
@@ -166,6 +166,10 @@ export const fetchAnalytics = async ({
       if (tags?.length > 0) query.whereIn("tag_id", tags);
       if (workspaces?.length > 0) query.whereIn("route_workspace_id", workspaces);
     }
+
+    if (groupByColumn === systemConstants.GROUP_BY_COLUMNS.DATE)
+      query.orderByRaw(`${groupByQuery} ASC`);
+    else query.orderByRaw(`unique_clicks DESC`);
 
     let rows = await query;
 
