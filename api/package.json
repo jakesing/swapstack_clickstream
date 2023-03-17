@@ -15,14 +15,14 @@
     "migrate:make": "knex migrate:make -x ts --knexfile src/config/knexfile.ts --env local",
     "migrate:latest": "npx knex migrate:latest --knexfile src/config/knexfile.ts  --env local",
     "migrate:rollback": "npx knex migrate:rollback --knexfile src/config/knexfile.ts --env local",
-    "seed:run": "knex seed:run --knexfile src/config/knexfile.ts --env local",
+    "seed:run": "env TZ='UTC' knex seed:run --knexfile src/config/knexfile.ts --env local",
     "migrate:make:stage": "knex migrate:make -x ts --knexfile src/config/knexfile.ts --env stage",
     "migrate:latest:stage": "npx knex migrate:latest --knexfile src/config/knexfile.ts --env stage",
-    "seed:run:stage": "knex seed:run --knexfile src/config/knexfile.ts --env stage",
+    "seed:run:stage": "env TZ='UTC' knex seed:run --knexfile src/config/knexfile.ts --env stage",
     "migrate:make:live": "knex migrate:make -x ts --knexfile src/config/knexfile.ts --env live",
     "migrate:latest:live": "npx knex migrate:latest --knexfile src/config/knexfile.ts --env live",
     "migrate:rollback:live": "npx knex migrate:rollback --knexfile src/config/knexfile.ts --env live",
-    "seed:run:live": "knex seed:run --knexfile src/config/knexfile.ts --env live"
+    "seed:run:live": "env TZ='UTC' knex seed:run --knexfile src/config/knexfile.ts --env live"
   },
   "engines": {
     "node": ">=16"
