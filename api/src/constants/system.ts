@@ -18,3 +18,13 @@ export enum GROUP_BY_VALUES {
   DATE = "date",
   HOUR = "hour",
 }
+
+export enum SORT_BY_COLUMNS {
+  LABEL = "label",
+  UNIQUE_HUMAN_CLICKS = "uniqueHumanClicks",
+}
+
+export enum SORT_ORDER {
+  ASC = "asc",
+  DESC = "desc",
+}

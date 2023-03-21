@@ -52,6 +52,8 @@ export const fetchAnalytics = async ({
   workspaces = [],
   groupByColumn = null,
   groupByValue = null,
+  sortBy = null,
+  sortOrder = null,
 }: {
   startDate: Date;
   endDate: Date;
@@ -60,6 +62,8 @@ export const fetchAnalytics = async ({
   workspaces?: string[];
   groupByColumn?: string;
   groupByValue?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }) => {
   try {
     const knex = dbUtils.fetchDb();
@@ -167,9 +171,13 @@ export const fetchAnalytics = async ({
       if (workspaces?.length > 0) query.whereIn("route_workspace_id", workspaces);
     }
 
-    if (groupByColumn === systemConstants.GROUP_BY_COLUMNS.DATE)
-      query.orderByRaw(`${groupByQuery} ASC`);
-    else query.orderByRaw(`unique_clicks DESC`);
+    if (
+      // groupByColumn === systemConstants.GROUP_BY_COLUMNS.DATE &&
+      sortBy === systemConstants.SORT_BY_COLUMNS.LABEL
+    )
+      query.orderByRaw(`${groupByQuery} ${sortOrder}`);
+    else if (sortBy === systemConstants.SORT_BY_COLUMNS.UNIQUE_HUMAN_CLICKS)
+      query.orderByRaw(`unique_clicks ${sortOrder}`);
 
     let rows = await query;
 

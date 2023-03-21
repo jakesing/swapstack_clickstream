@@ -31,6 +31,8 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
         links = [],
         tags = [],
         workspaces = [],
+        sortBy,
+        sortOrder,
       },
     } = event;
 
@@ -57,6 +59,8 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
       groupByValue: dateGrouping,
       tags,
       workspaces,
+      sortBy,
+      sortOrder,
     });
 
     return result;
