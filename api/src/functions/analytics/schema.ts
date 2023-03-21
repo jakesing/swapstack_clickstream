@@ -16,7 +16,17 @@ export const analyticsBodySchema = Yup.object({
       then: (schema) => schema.required().trim(),
       otherwise: (schema) => schema.default(null).nullable(),
     }),
+  sortBy: Yup.string()
+    .default(null)
+    .nullable()
+    .oneOf(Object.values(systemConstants.SORT_BY_COLUMNS)),
+  sortOrder: Yup.string()
+    .default(systemConstants.SORT_ORDER.DESC)
+    .nullable()
+    .oneOf(Object.values(systemConstants.SORT_ORDER)),
   links: Yup.array().of(Yup.string()).default([]),
+  tags: Yup.array().of(Yup.string()).default([]),
+  workspaces: Yup.array().of(Yup.string()).default([]),
 })
   .required()
   .noUnknown(true);

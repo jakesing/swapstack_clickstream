@@ -1,4 +1,4 @@
-import { parse, isValid } from "date-fns";
+import { isValid, parseISO } from "date-fns";
 
 import { middyfyApi } from "@libs/lambda";
 import { ValidatedAPIGatewayProxyEvent } from "@libs/api-gateway";
@@ -15,7 +15,7 @@ import * as dbUtils from "../../utils/db.helpers";
 
 import { analyticsBodySchema } from "./schema";
 
-const DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
+// const DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
 
 // initialise db
 dbUtils.fetchDb();
@@ -23,18 +23,26 @@ dbUtils.fetchDb();
 const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => {
   try {
     const {
-      body: { startDate, endDate, groupByColumn = null, dateGrouping = null, links = [] },
+      body: {
+        startDate,
+        endDate,
+        groupByColumn = null,
+        dateGrouping = null,
+        links = [],
+        tags = [],
+        workspaces = [],
+        sortBy,
+        sortOrder,
+      },
     } = event;
 
     if (dateGrouping && !groupByColumn) throw apiExceptions.missingGroupByColumnClause;
 
-    const now: Date = new Date();
-
     let parsedEndDate: Date = null;
-    const parsedStartDate: Date = parse(startDate, DATE_FORMAT, now);
+    const parsedStartDate: Date = parseISO(startDate);
     if (endDate) {
       // parse end date and ensure it is after start date
-      parsedEndDate = parse(endDate, DATE_FORMAT, now);
+      parsedEndDate = parseISO(endDate);
 
       if (parsedStartDate.getTime() > parsedEndDate.getTime())
         throw apiExceptions.startTimeAfterEndTimeError;
@@ -49,6 +57,10 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
       links: links as string[],
       groupByColumn,
       groupByValue: dateGrouping,
+      tags,
+      workspaces,
+      sortBy,
+      sortOrder,
     });
 
     return result;

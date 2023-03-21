@@ -11,14 +11,17 @@ const childTableName = "clickstream_events_child";
 
 import * as apiExceptions from "../exceptions/api";
 
-export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
+export const logEvents = async (rows: IEventDBRow[]): Promise<number[]> => {
   try {
     const knex = dbUtils.fetchDb();
 
+    const ids: number[] = [];
     await Promise.all(
       rows.map(async (row) => {
         try {
           const parentId: number[] = await knex(parentTableName).insert(row.parent, "id");
+
+          ids.push(parentId[0]);
 
           await knex(childTableName).insert(
             {
@@ -35,7 +38,7 @@ export const logEvents = async (rows: IEventDBRow[]): Promise<boolean> => {
       }),
     );
 
-    return true;
+    return ids;
   } catch (error) {
     throw error;
   }
@@ -45,14 +48,22 @@ export const fetchAnalytics = async ({
   startDate,
   endDate,
   links = [],
+  tags = [],
+  workspaces = [],
   groupByColumn = null,
   groupByValue = null,
+  sortBy = null,
+  sortOrder = null,
 }: {
   startDate: Date;
   endDate: Date;
+  tags?: string[];
   links?: string[];
+  workspaces?: string[];
   groupByColumn?: string;
   groupByValue?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }) => {
   try {
     const knex = dbUtils.fetchDb();
@@ -65,31 +76,31 @@ export const fetchAnalytics = async ({
       case systemConstants.GROUP_BY_COLUMNS.DATE:
         switch (groupByValue) {
           case systemConstants.GROUP_BY_VALUES.YEAR:
-            groupByQuery = "YEAR(log_date)";
+            groupByQuery = "YEAR(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.QUARTER:
-            groupByQuery = "QUARTER(log_date)";
+            groupByQuery = "QUARTER(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.MONTH:
-            groupByQuery = "MONTH(log_date)";
+            groupByQuery = "MONTH(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.WEEK:
-            groupByQuery = "WEEK(log_date)";
+            groupByQuery = "WEEK(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.DAY:
-            groupByQuery = "DAY(log_date)";
+            groupByQuery = "DAY(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.DATE:
-            groupByQuery = "DATE(log_date)";
+            groupByQuery = "DATE(FROM_UNIXTIME(log_date_unix))";
             break;
 
           case systemConstants.GROUP_BY_VALUES.HOUR:
-            groupByQuery = "HOUR(log_date)";
+            groupByQuery = "HOUR(FROM_UNIXTIME(log_date_unix))";
             break;
 
           default:
@@ -130,7 +141,7 @@ export const fetchAnalytics = async ({
     }
 
     if (groupByQuery) {
-      query.groupByRaw(groupByQuery).orderByRaw(`${groupByQuery} DESC`);
+      query.groupByRaw(groupByQuery);
     } else {
       groupByQuery = "COUNT(*)";
     }
@@ -148,9 +159,25 @@ export const fetchAnalytics = async ({
       ),
     );
 
-    if (startDate) query.where("log_date", ">=", startDate);
-    if (endDate) query.andWhere("log_date", "<=", endDate);
+    if (startDate) query.where("log_date_unix", ">=", startDate.getTime() / 1000);
+    if (endDate) query.andWhere("log_date_unix", "<=", endDate.getTime() / 1000);
     if (links?.length > 0) query.whereIn("route_id", links);
+
+    if (tags?.length > 0 || workspaces?.length > 0) {
+      // join the child table as well
+      query.leftJoin(childTableName, `${parentTableName}.id`, `${childTableName}.id_parent`);
+
+      if (tags?.length > 0) query.whereIn("tag_id", tags);
+      if (workspaces?.length > 0) query.whereIn("route_workspace_id", workspaces);
+    }
+
+    if (
+      // groupByColumn === systemConstants.GROUP_BY_COLUMNS.DATE &&
+      sortBy === systemConstants.SORT_BY_COLUMNS.LABEL
+    )
+      query.orderByRaw(`${groupByQuery} ${sortOrder}`);
+    else if (sortBy === systemConstants.SORT_BY_COLUMNS.UNIQUE_HUMAN_CLICKS)
+      query.orderByRaw(`unique_clicks ${sortOrder}`);
 
     let rows = await query;
 

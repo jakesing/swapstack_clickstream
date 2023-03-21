@@ -9,6 +9,7 @@ export default interface IClickStreamEventChild {
   route_slash_tag: string;
   route_creator_id: string;
   route_creator_name: string;
+  route_workspace_id: string;
   route_workspace_name: string;
   route_domain_id: string;
   route_domain_raw: string;

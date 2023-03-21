@@ -6,7 +6,7 @@ export enum GROUP_BY_COLUMNS {
   BROWSER = "browser",
   DEVICE = "device",
   REFERRER = "referrer",
-  LINKS = "links",
+  LINKS = "link",
 }
 
 export enum GROUP_BY_VALUES {
@@ -17,4 +17,14 @@ export enum GROUP_BY_VALUES {
   DAY = "day",
   DATE = "date",
   HOUR = "hour",
+}
+
+export enum SORT_BY_COLUMNS {
+  LABEL = "label",
+  UNIQUE_HUMAN_CLICKS = "uniqueHumanClicks",
+}
+
+export enum SORT_ORDER {
+  ASC = "asc",
+  DESC = "desc",
 }
