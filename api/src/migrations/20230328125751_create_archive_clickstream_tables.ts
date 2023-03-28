@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
       table.integer("id").unsigned().primary();
 
       table.dateTime("log_date", { useTz: true });
-      table.integer("log_date_unix", 11).nullable().defaultTo(null);
+      table.integer("log_date_unix", 11).nullable().defaultTo(null).index();
       table.string("language");
       table.string("country");
       table.string("agent_type");
@@ -24,7 +24,6 @@ export async function up(knex: Knex): Promise<void> {
       table.dateTime("createdAt", { useTz: true }).defaultTo(knex.fn.now());
       table.dateTime("updatedAt", { useTz: true }).defaultTo(knex.fn.now());
 
-      table.index("log_date");
       table.index("language");
       table.index("country");
       table.index("agent_type");
