@@ -2,6 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 import process from "@functions/process";
 import analytics from "@functions/analytics";
+import archive from "@functions/archive";
 
 const serverlessConfiguration: AWS = {
   service: "swapstack-rebrandly-s3-parser",
@@ -52,7 +53,7 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  functions: { process, analytics },
+  functions: { process, analytics, archive },
   package: { individually: true },
   custom: {
     apiGatewayThrottling: {
