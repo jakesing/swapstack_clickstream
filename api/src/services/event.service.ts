@@ -8,6 +8,8 @@ import * as systemConstants from "../constants/system";
 
 const parentTableName = "clickstream_events_parent";
 const childTableName = "clickstream_events_child";
+const archiveParentTableName = "archived_clickstream_events_parent";
+const archiveChildTableName = "archived_clickstream_events_child";
 
 import * as apiExceptions from "../exceptions/api";
 
@@ -197,6 +199,52 @@ export const fetchAnalytics = async ({
     }
 
     return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const archiveClicks = async (
+  links: string[],
+  startDate: Date,
+  endDate: Date,
+): Promise<boolean> => {
+  try {
+    const knex = dbUtils.fetchDb();
+
+    const parsedLinks: string = links.map((link) => `'${link}'`).join(",");
+
+    let parentWhereClause: string = `route_id IN ( ${parsedLinks} )`;
+
+    if (startDate) parentWhereClause += ` AND log_date_unix >= ${startDate.getTime() / 1000}`;
+    if (endDate) parentWhereClause += ` AND log_date_unix <= ${endDate.getTime() / 1000}`;
+
+    const parentQuery: string = `INSERT INTO ${archiveParentTableName} (id, log_date, log_date_unix, language, country, agent_type, browser, os, device, referrer, is_first_session, route_id, route_workspace_id)
+    SELECT id, log_date, log_date_unix, language, country, agent_type, browser, os, device, referrer, is_first_session, route_id, route_workspace_id
+    FROM ${parentTableName}
+    WHERE ${parentWhereClause};`;
+
+    const childQuery: string = `INSERT INTO ${archiveChildTableName} (id, id_parent, region, os_version, session_start_date, referrer_protocol, referrer_path, route_slash_tag, route_creator_id, route_creator_name, route_workspace_id, route_workspace_name, route_domain_id, route_domain_raw, route_domain_zone, route_destination_raw, route_destination_protocol, tag_id, tag_value)
+    SELECT id, id_parent, region, os_version, session_start_date, referrer_protocol, referrer_path, route_slash_tag, route_creator_id, route_creator_name, route_workspace_id, route_workspace_name, route_domain_id, route_domain_raw, route_domain_zone, route_destination_raw, route_destination_protocol, tag_id, tag_value
+    FROM ${childTableName} cd
+    WHERE cd.id_parent IN ( SELECT id from ${parentTableName} pt WHERE pt.${parentWhereClause});`;
+
+    // const childDeleteQuery: string = `DELETE from ${childTableName} WHERE id_parent IN ( SELECT id from ${parentTableName} WHERE route_id IN ( ${parsedLinks} ))`;
+    const parentDeleteQuery: string = `DELETE from ${parentTableName} WHERE ${parentWhereClause}`;
+
+    await knex.transaction(async (trx) => {
+      try {
+        await knex.raw(parentQuery).transacting(trx);
+        await knex.raw(childQuery).transacting(trx);
+
+        // await knex.raw(childDeleteQuery).transacting(trx);
+        await knex.raw(parentDeleteQuery).transacting(trx);
+      } catch (trxError) {
+        throw trxError;
+      }
+    });
+
+    return true;
   } catch (error) {
     throw error;
   }
