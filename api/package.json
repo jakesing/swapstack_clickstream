@@ -28,8 +28,8 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.300.0",
-    "@aws-sdk/client-sqs": "^3.300.0",
+    "@aws-sdk/client-s3": "^3.305.0",
+    "@aws-sdk/client-sqs": "^3.303.0",
     "@middy/core": "^4.2.8",
     "@middy/do-not-wait-for-empty-event-loop": "^4.2.8",
     "@middy/error-logger": "^4.2.8",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@serverless/typescript": "^3.29.0",
     "@types/aws-lambda": "^8.10.114",
-    "@types/node": "^18.15.10",
+    "@types/node": "^18.15.11",
     "dotenv": "^16.0.3",
     "esbuild": "0.16.17",
     "eslint-config-prettier": "^8.8.0",
@@ -64,7 +64,7 @@
     "serverless-offline": "^12.0.4",
     "serverless-prune-plugin": "^2.0.2",
     "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.1.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^4.9.5"
   }
 }

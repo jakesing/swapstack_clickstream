@@ -9,7 +9,7 @@ export default {
         method: "put",
         path: "clicks/archive",
         cors: true,
-        private: false,
+        private: true,
       },
     },
   ],
