@@ -28,3 +28,16 @@ export enum SORT_ORDER {
   ASC = "asc",
   DESC = "desc",
 }
+
+export enum FILTER_BY_COLUMNS {
+  LANGUAGE = "language",
+  COUNTRY = "country",
+  AGENT_TYPE = "agent_type",
+  BROWSER = "browser",
+  OS = "os",
+  DEVICE = "device",
+  REFERRER = "referrer",
+  IS_FIRST_SESSION = "is_first_session",
+  ROUTE_ID = "route_id",
+  ROUTE_WORKSPACE_ID = "route_workspace_id",
+}

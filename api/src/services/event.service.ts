@@ -56,6 +56,8 @@ export const fetchAnalytics = async ({
   groupByValue = null,
   sortBy = null,
   sortOrder = null,
+  filterByColumn = null,
+  filterByValue = null,
 }: {
   startDate: Date;
   endDate: Date;
@@ -66,6 +68,8 @@ export const fetchAnalytics = async ({
   groupByValue?: string;
   sortBy?: string;
   sortOrder?: string;
+  filterByColumn?: string;
+  filterByValue?: string;
 }) => {
   try {
     const knex = dbUtils.fetchDb();
@@ -165,12 +169,15 @@ export const fetchAnalytics = async ({
     if (endDate) query.andWhere("log_date_unix", "<=", endDate.getTime() / 1000);
     if (links?.length > 0) query.whereIn("route_id", links);
 
+    if (filterByColumn) query.where(`${parentTableName}.${filterByColumn}`, filterByValue);
+
     if (tags?.length > 0 || workspaces?.length > 0) {
       // join the child table as well
       query.leftJoin(childTableName, `${parentTableName}.id`, `${childTableName}.id_parent`);
 
       if (tags?.length > 0) query.whereIn("tag_id", tags);
-      if (workspaces?.length > 0) query.whereIn("route_workspace_id", workspaces);
+      if (workspaces?.length > 0)
+        query.whereIn(`${parentTableName}.route_workspace_id`, workspaces);
     }
 
     if (
