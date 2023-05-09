@@ -27,6 +27,15 @@ export const analyticsBodySchema = Yup.object({
   links: Yup.array().of(Yup.string()).default([]),
   tags: Yup.array().of(Yup.string()).default([]),
   workspaces: Yup.array().of(Yup.string()).default([]),
+  filterByColumn: Yup.string()
+    .default(null)
+    .nullable()
+    .oneOf(Object.values(systemConstants.FILTER_BY_COLUMNS)),
+  filterByValue: Yup.string().when("filterByColumn", {
+    is: (val: string) => !!val,
+    then: (schema) => schema.trim().nullable(),
+    otherwise: (schema) => schema.default(null).nullable(),
+  }),
 })
   .required()
   .noUnknown(true);

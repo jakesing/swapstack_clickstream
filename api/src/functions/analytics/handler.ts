@@ -33,6 +33,8 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
         workspaces = [],
         sortBy,
         sortOrder,
+        filterByColumn = null,
+        filterByValue = null,
       },
     } = event;
 
@@ -61,6 +63,8 @@ const process = async (event: ValidatedAPIGatewayProxyEvent<IAnalyticsApis>) => 
       workspaces,
       sortBy,
       sortOrder,
+      filterByColumn,
+      filterByValue,
     });
 
     return result;
